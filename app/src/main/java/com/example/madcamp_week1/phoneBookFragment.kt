@@ -112,8 +112,10 @@ class phoneBookFragment : Fragment() {
             while (cursor.moveToNext()) {
                 val name = cursor.getString(nameIndex)
                 val number = cursor.getString(numberIndex)
-                nameList.add(name)
-                numList.add(number)
+                if (!nameList.contains(name) && !numList.contains(number)) {
+                    nameList.add(name)
+                    numList.add(number)
+                }
             }
             (view?.findViewById<ListView>(R.id.listView)?.adapter as CustomAdapter).notifyDataSetChanged()
         }
