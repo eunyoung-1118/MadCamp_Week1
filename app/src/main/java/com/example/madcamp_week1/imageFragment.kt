@@ -1,47 +1,55 @@
 package com.example.madcamp_week1
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class ImageFragment : Fragment() {
+class imageFragment : Fragment() {
 
-    private val imageUrls = mutableListOf(
+    private val imageUrls = mutableListOf<String>()
+    private lateinit var imageAdapter: ImageAdapter
 
-        "https://example.com/image1.jpg",
-        "https://example.com/image2.jpg"
-        // ...
-    )
-
-    private lateinit var recyclerView: RecyclerView
+    private val getImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            val selectedImage: Uri? = data?.data
+            selectedImage?.let {
+                imageUrls.add(it.toString())
+                imageAdapter.notifyItemInserted(imageUrls.size - 1)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_image, container, false)
-    }
+        val view = inflater.inflate(R.layout.fragment_image, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        recyclerView = view.findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = GridLayoutManager(context, 2)
-        recyclerView.adapter = ImageAdapter(imageUrls)
-
-        val addButton: Button = view.findViewById(R.id.addButton)
-        addButton.setOnClickListener {
-            (activity as? MainActivity)?.openGallery()
+        imageAdapter = ImageAdapter(imageUrls) { position ->
+            // Handle item click
         }
-    }
 
-    fun setImageUri(uri: Uri) {
-        imageUrls.add(uri.toString())
-        recyclerView.adapter?.notifyDataSetChanged()
+        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = imageAdapter
+
+        val addButton: FloatingActionButton = view.findViewById(R.id.addButton)
+        addButton.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            getImage.launch(intent)
+        }
+
+        return view
     }
 }
