@@ -74,6 +74,7 @@ class phoneBookFragment : Fragment() {
         list.setOnItemLongClickListener { parent, view, position, id ->
             nameList.removeAt(position)
             numList.removeAt(position)
+            sortLists()
             adapter.notifyDataSetChanged()
             true
         }
@@ -92,6 +93,7 @@ class phoneBookFragment : Fragment() {
                 if (name != null && number != null) {
                     nameList.add(name)
                     numList.add(number)
+                    sortLists()
                     (view?.findViewById<ListView>(R.id.listView)?.adapter as CustomAdapter).notifyDataSetChanged()
                 }
             }
@@ -117,7 +119,18 @@ class phoneBookFragment : Fragment() {
                     numList.add(number)
                 }
             }
+            sortLists()
             (view?.findViewById<ListView>(R.id.listView)?.adapter as CustomAdapter).notifyDataSetChanged()
+        }
+    }
+
+    private fun sortLists() {
+        val sortedList = nameList.zip(numList).sortedBy { it.first }
+        nameList.clear()
+        numList.clear()
+        for ((name, number) in sortedList) {
+            nameList.add(name)
+            numList.add(number)
         }
     }
 
