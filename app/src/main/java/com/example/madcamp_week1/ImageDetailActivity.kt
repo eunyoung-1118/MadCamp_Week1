@@ -16,6 +16,7 @@ import com.example.madcamp_week1.databinding.ActivityImageDetailBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.media.ExifInterface
 
 class ImageDetailActivity : AppCompatActivity() {
 
@@ -84,14 +85,30 @@ class ImageDetailActivity : AppCompatActivity() {
             Glide.with(this)
                 .load(it)
                 .into(binding.detailImageView)
-            setDate() // Set the date to the current date
+            setExifDate() // Set the date to the photo's taken date
             loadData() // Load saved data after loading the image
         } ?: showErrorAndFinish()
     }
 
-    private fun setDate() {
-        val currentDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-        binding.dateEditText.setText(currentDate)
+    private fun setExifDate() {
+        try {
+            imageUrl?.let { url ->
+                val inputStream = contentResolver.openInputStream(android.net.Uri.parse(url))
+                inputStream?.let {
+                    val exif = ExifInterface(it)
+                    val exifDate = exif.getAttribute(ExifInterface.TAG_DATETIME)
+                    val formatter = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault())
+                    val date: Date? = exifDate?.let { formatter.parse(it) }
+                    val displayFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                    val displayDate = date?.let { displayFormatter.format(it) } ?: ""
+                    binding.dateEditText.setText(displayDate)
+                    it.close()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            binding.dateEditText.setText("") // Clear date field if there's an error
+        }
     }
 
     private fun loadData() {
