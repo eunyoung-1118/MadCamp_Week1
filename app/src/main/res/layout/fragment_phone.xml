@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity">
+    android:background="@drawable/background"
+    tools:context=".MainActivity"
+    >
 
     <FrameLayout
         android:id="@+id/fragment_container"
@@ -21,7 +22,7 @@
                 android:id="@+id/phonebook_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
+                android:background="#B4C1A7"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                 android:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
@@ -52,7 +53,12 @@
             <ListView
                 android:id="@+id/listView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="24dp"
+                android:layout_margin="16dp"
+                android:background="@android:color/transparent"
+                android:fontFamily="@font/nanum"/>
         </LinearLayout>
     </FrameLayout>
 

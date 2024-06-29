@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/phone_item_border"
+    android:layout_margin="8dp"
+    android:padding="32dp">
 
     <ImageView
         android:id="@+id/contact_image"
@@ -12,25 +15,25 @@
         android:scaleType="centerCrop"
         android:background="#e2e2e2"/>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+            <TextView
+                android:id="@+id/nameItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#0000ff"
+                android:textSize="30dp" />
 
-        <TextView
-            android:id="@+id/nameItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#0000ff"
-            android:textSize="30dp" />
+            <TextView
+                android:id="@+id/numItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/nameItem"
+                android:textSize="25dp" />
 
-        <TextView
-            android:id="@+id/numItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/nameItem"
-            android:textSize="25dp" />
+        </RelativeLayout>
 
-    </RelativeLayout>
 </LinearLayout>

@@ -15,6 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.tabs.TabLayout
@@ -23,14 +24,16 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="#B4C1A7"
+        style="@style/CustomTabLayout">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/phoneBook_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/phonebook"
-            android:text="@string/phonebook" />
+            android:text="@string/phonebook"/>
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/img_button"
