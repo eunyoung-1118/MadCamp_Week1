@@ -52,4 +52,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.glide) // Glide 라이브러리
     annotationProcessor(libs.glideCompiler) // Glide 컴파일러
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
 }
