@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@drawable/background">
 
         <ImageView
             android:id="@+id/detailImageView"
@@ -46,3 +47,4 @@
             android:text="Save"/>
     </LinearLayout>
 </layout>
+<!-- 이미지 디테일 뷰 테두리 설정, 이미지 뷰 테두리 설정 및 서로 멀어저기 -->
