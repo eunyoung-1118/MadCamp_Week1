@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:hint="전화번호"
-        android:inputType="number" />
+        android:inputType="phone" />
 
     <Button
         android:id="@+id/btnAdd"
