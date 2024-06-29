@@ -97,15 +97,6 @@ class phoneBookFragment : Fragment() {
                 .commit()
         }
 
-        list.setOnItemLongClickListener { parent, view, position, id ->
-            nameList.removeAt(position)
-            numList.removeAt(position)
-            photoUriList.removeAt(position)
-            sortLists()
-            adapter.notifyDataSetChanged()
-            true
-        }
-
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             loadContacts()
             syncedNameList = ArrayList(nameList)

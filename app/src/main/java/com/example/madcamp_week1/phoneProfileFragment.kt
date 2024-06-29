@@ -1,7 +1,9 @@
 package com.example.madcamp_week1
 
+import android.content.Intent
 import android.os.Bundle
 import android.app.Activity
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +42,8 @@ class phoneProfileFragment : Fragment() {
         nameTextView = view.findViewById(R.id.profile_name)
         numberTextView = view.findViewById(R.id.profile_num)
         profileImageView = view.findViewById(R.id.profile_image)
+        val callButton = view.findViewById<ImageView>(R.id.call_button)
+        val messageButton = view.findViewById<ImageView>(R.id.message_button)
 
         val name = arguments?.getString("name")
         val number = arguments?.getString("number")
@@ -55,6 +59,18 @@ class phoneProfileFragment : Fragment() {
                 .into(profileImageView)
         } else {
             profileImageView.setImageResource(R.drawable.person)
+        }
+
+        callButton.setOnClickListener {
+            val dialIntent = Intent(Intent.ACTION_DIAL)
+            dialIntent.data = Uri.parse("tel:$number")
+            startActivity(dialIntent)
+        }
+
+        messageButton.setOnClickListener {
+            val smsIntent = Intent(Intent.ACTION_VIEW)
+            smsIntent.data = Uri.parse("sms:$number")
+            startActivity(smsIntent)
         }
     }
 
