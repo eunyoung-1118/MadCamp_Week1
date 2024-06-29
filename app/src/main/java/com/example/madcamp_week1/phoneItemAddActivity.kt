@@ -1,10 +1,8 @@
 package com.example.madcamp_week1
 
 import android.app.Activity
-import android.content.ContentProviderOperation
 import android.content.Intent
 import android.os.Bundle
-import android.provider.ContactsContract
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
 import android.widget.EditText

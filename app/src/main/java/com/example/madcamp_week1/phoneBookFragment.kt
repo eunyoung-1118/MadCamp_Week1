@@ -16,7 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
 import android.content.ContentResolver
 import android.provider.ContactsContract
-import android.content.ContentUris
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 
@@ -29,8 +28,12 @@ class phoneBookFragment : Fragment() {
     }
     private val nameList = ArrayList<String>()
     private val numList = ArrayList<String>()
+    private var syncedNameList = ArrayList<String>()
+    private var syncedNumList = ArrayList<String>()
 
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent>
+    private lateinit var editContactLauncher: ActivityResultLauncher<Intent>
+    private var selectedPosition: Int = -1
     private lateinit var requestPermissionLauncher: androidx.activity.result.ActivityResultLauncher<String>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -43,12 +46,16 @@ class phoneBookFragment : Fragment() {
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
                 loadContacts()
+                syncedNameList = ArrayList(nameList)
+                syncedNumList = ArrayList(numList)
             } else {
                 Toast.makeText(context, "Contacts permission denied", Toast.LENGTH_SHORT).show()
             }
         }
 
         val addButton = view.findViewById<TextView>(R.id.add_button)
+        val updateButton = view.findViewById<TextView>(R.id.update_button)
+
         addButton.setOnClickListener {
             val intent = Intent(activity, phoneItemAddActivity::class.java)
             addContactLauncher.launch(intent)
@@ -59,9 +66,15 @@ class phoneBookFragment : Fragment() {
         val adapter = CustomAdapter(requireContext())
         list.adapter = adapter
 
+        updateButton.setOnClickListener {
+            retainSyncedItems()
+            adapter.notifyDataSetChanged()
+        }
+
         list.setOnItemClickListener { parent, view, position, id ->
             val name = nameList[position]
             val number = numList[position]
+            selectedPosition = position
 
             val profileFragment = phoneProfileFragment.newInstance(name, number)
 
@@ -81,15 +94,16 @@ class phoneBookFragment : Fragment() {
 
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
             loadContacts()
+            syncedNameList = ArrayList(nameList)
+            syncedNumList = ArrayList(numList)
         } else {
             requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         }
 
         addContactLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                val name = data?.getStringExtra("name")
-                val number = data?.getStringExtra("number")
+                val name = result.data?.getStringExtra("name")
+                val number = result.data?.getStringExtra("number")
                 if (name != null && number != null) {
                     nameList.add(name)
                     numList.add(number)
@@ -158,4 +172,53 @@ class phoneBookFragment : Fragment() {
         }
     }
 
+    private fun getContacts(): List<Pair<String, String>> {
+        val contacts = mutableListOf<Pair<String, String>>()
+        val contentResolver = requireContext().contentResolver
+        val cursor = contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            null, null, null, null
+        )
+        cursor?.use {
+            val nameIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            while (it.moveToNext()) {
+                val name = it.getString(nameIndex)
+                val number = it.getString(numberIndex)
+                contacts.add(Pair(name, number))
+            }
+        }
+        return contacts
+    }
+
+    private fun syncContacts() {
+        val contacts = getContacts()
+        val names = contacts.map { it.first }
+        val numbers = contacts.map { it.second }
+        setSyncedData(names, numbers)
+    }
+
+    private fun setSyncedData(names: List<String>, numbers: List<String>) {
+        syncedNameList.clear()
+        syncedNameList.addAll(names)
+        syncedNumList.clear()
+        syncedNumList.addAll(numbers)
+
+        nameList.clear()
+        nameList.addAll(names)
+        numList.clear()
+        numList.addAll(numbers)
+    }
+
+    private fun retainSyncedItems() {
+        val newList = nameList.zip(numList).filter { (name, num) ->
+            syncedNameList.contains(name) && syncedNumList.contains(num)
+        }
+        nameList.clear()
+        numList.clear()
+        for ((name, number) in newList) {
+            nameList.add(name)
+            numList.add(number)
+        }
+    }
 }
