@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.content.Context
+import android.database.ContentObserver
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -17,7 +18,10 @@ import androidx.activity.result.ActivityResultLauncher
 import android.content.ContentResolver
 import android.provider.ContactsContract
 import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
 import androidx.core.app.ActivityCompat
+import com.bumptech.glide.Glide
 
 class phoneBookFragment : Fragment() {
     override fun onCreateView(
@@ -28,13 +32,15 @@ class phoneBookFragment : Fragment() {
     }
     private val nameList = ArrayList<String>()
     private val numList = ArrayList<String>()
+    private val photoUriList = ArrayList<String>()
     private var syncedNameList = ArrayList<String>()
     private var syncedNumList = ArrayList<String>()
+    private var syncedPhotoUriList = ArrayList<String>()
 
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent>
-    private lateinit var editContactLauncher: ActivityResultLauncher<Intent>
     private var selectedPosition: Int = -1
-    private lateinit var requestPermissionLauncher: androidx.activity.result.ActivityResultLauncher<String>
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var contentObserver: ContentObserver
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -48,6 +54,8 @@ class phoneBookFragment : Fragment() {
                 loadContacts()
                 syncedNameList = ArrayList(nameList)
                 syncedNumList = ArrayList(numList)
+                syncedPhotoUriList = ArrayList(photoUriList)
+                registerContentObserver()
             } else {
                 Toast.makeText(context, "Contacts permission denied", Toast.LENGTH_SHORT).show()
             }
@@ -74,9 +82,10 @@ class phoneBookFragment : Fragment() {
         list.setOnItemClickListener { parent, view, position, id ->
             val name = nameList[position]
             val number = numList[position]
+            val photoUri = photoUriList[position]
             selectedPosition = position
 
-            val profileFragment = phoneProfileFragment.newInstance(name, number)
+            val profileFragment = phoneProfileFragment.newInstance(name, number, photoUri)
 
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, profileFragment)
@@ -87,6 +96,7 @@ class phoneBookFragment : Fragment() {
         list.setOnItemLongClickListener { parent, view, position, id ->
             nameList.removeAt(position)
             numList.removeAt(position)
+            photoUriList.removeAt(position)
             sortLists()
             adapter.notifyDataSetChanged()
             true
@@ -96,6 +106,8 @@ class phoneBookFragment : Fragment() {
             loadContacts()
             syncedNameList = ArrayList(nameList)
             syncedNumList = ArrayList(numList)
+            syncedPhotoUriList = ArrayList(photoUriList)
+            registerContentObserver()
         } else {
             requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         }
@@ -107,6 +119,7 @@ class phoneBookFragment : Fragment() {
                 if (name != null && number != null) {
                     nameList.add(name)
                     numList.add(number)
+                    photoUriList.add("")
                     sortLists()
                     (view?.findViewById<ListView>(R.id.listView)?.adapter as CustomAdapter).notifyDataSetChanged()
                 }
@@ -124,13 +137,16 @@ class phoneBookFragment : Fragment() {
         cursor?.use {
             val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
             val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            val photoUriIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
 
             while (cursor.moveToNext()) {
                 val name = cursor.getString(nameIndex)
                 val number = cursor.getString(numberIndex)
+                val photoUri = cursor.getString(photoUriIndex) ?: ""
                 if (!nameList.contains(name) && !numList.contains(number)) {
                     nameList.add(name)
                     numList.add(number)
+                    photoUriList.add(photoUri)
                 }
             }
             sortLists()
@@ -139,13 +155,36 @@ class phoneBookFragment : Fragment() {
     }
 
     private fun sortLists() {
-        val sortedList = nameList.zip(numList).sortedBy { it.first }
+        val sortedList = nameList.zip(numList).zip(photoUriList) { (name, number), photoUri -> Triple(name, number, photoUri) }
+            .sortedBy { it.first }
         nameList.clear()
         numList.clear()
-        for ((name, number) in sortedList) {
+        photoUriList.clear()
+        for ((name, number, photoUri) in sortedList) {
             nameList.add(name)
             numList.add(number)
+            photoUriList.add(photoUri)
         }
+    }
+
+    private fun registerContentObserver() {
+        contentObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
+            override fun onChange(selfChange: Boolean) {
+                super.onChange(selfChange)
+                loadContacts()
+                (view?.findViewById<ListView>(R.id.listView)?.adapter as CustomAdapter).notifyDataSetChanged()
+            }
+        }
+        requireContext().contentResolver.registerContentObserver(
+            ContactsContract.Contacts.CONTENT_URI,
+            true,
+            contentObserver
+        )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        requireContext().contentResolver.unregisterContentObserver(contentObserver)
     }
 
     private inner class CustomAdapter(private val context: Context) : BaseAdapter() {
@@ -165,60 +204,38 @@ class phoneBookFragment : Fragment() {
             val itemView: View = convertView ?: View.inflate(context, R.layout.phone_item, null)
             val nameItem = itemView.findViewById<TextView>(R.id.nameItem)
             val numItem = itemView.findViewById<TextView>(R.id.numItem)
+            val photoItem = itemView.findViewById<ImageView>(R.id.contact_image)
 
             nameItem.text = nameList[position]
             numItem.text = numList[position]
+
+            val photoUri = photoUriList[position]
+            if (photoUri.isNotEmpty()) {
+                Glide.with(context)
+                    .load(photoUri)
+                    .placeholder(R.drawable.person)
+                    .into(photoItem)
+            } else {
+                photoItem.setImageResource(R.drawable.person)
+            }
+
             return itemView
         }
     }
 
-    private fun getContacts(): List<Pair<String, String>> {
-        val contacts = mutableListOf<Pair<String, String>>()
-        val contentResolver = requireContext().contentResolver
-        val cursor = contentResolver.query(
-            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-            null, null, null, null
-        )
-        cursor?.use {
-            val nameIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-            val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-            while (it.moveToNext()) {
-                val name = it.getString(nameIndex)
-                val number = it.getString(numberIndex)
-                contacts.add(Pair(name, number))
-            }
-        }
-        return contacts
-    }
-
-    private fun syncContacts() {
-        val contacts = getContacts()
-        val names = contacts.map { it.first }
-        val numbers = contacts.map { it.second }
-        setSyncedData(names, numbers)
-    }
-
-    private fun setSyncedData(names: List<String>, numbers: List<String>) {
-        syncedNameList.clear()
-        syncedNameList.addAll(names)
-        syncedNumList.clear()
-        syncedNumList.addAll(numbers)
-
-        nameList.clear()
-        nameList.addAll(names)
-        numList.clear()
-        numList.addAll(numbers)
-    }
-
     private fun retainSyncedItems() {
-        val newList = nameList.zip(numList).filter { (name, num) ->
+        val newList = nameList.zip(numList).zip(photoUriList) { (name, num), photoUri ->
+            Triple(name, num, photoUri)
+        }.filter { (name, num, _) ->
             syncedNameList.contains(name) && syncedNumList.contains(num)
         }
         nameList.clear()
         numList.clear()
-        for ((name, number) in newList) {
+        photoUriList.clear()
+        for ((name, number, photoUri) in newList) {
             nameList.add(name)
             numList.add(number)
+            photoUriList.add(photoUri)
         }
     }
 }
