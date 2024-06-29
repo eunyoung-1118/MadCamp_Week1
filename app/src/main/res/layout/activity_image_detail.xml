@@ -17,13 +17,28 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
-            android:layout_marginBottom="16dp"/>
+            android:layout_margin="16dp"
+            android:background="@drawable/photo_frame" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="날짜"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"/>
 
         <EditText
             android:id="@+id/dateEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Date"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="장소"
+            android:textSize="18sp"
             android:layout_marginBottom="8dp"/>
 
         <EditText
@@ -31,6 +46,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Place"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="있었던 일"
+            android:textSize="18sp"
             android:layout_marginBottom="8dp"/>
 
         <EditText
@@ -38,6 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Memo"
+            android:maxLines="3"
             android:layout_marginBottom="16dp"/>
 
         <Button
@@ -47,4 +70,3 @@
             android:text="Save"/>
     </LinearLayout>
 </layout>
-<!-- 이미지 디테일 뷰 테두리 설정, 이미지 뷰 테두리 설정 및 서로 멀어저기 -->
