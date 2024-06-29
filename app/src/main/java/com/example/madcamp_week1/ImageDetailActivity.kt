@@ -2,6 +2,7 @@ package com.example.madcamp_week1
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
@@ -46,6 +47,11 @@ class ImageDetailActivity : AppCompatActivity() {
             val memo = binding.memoEditText.text.toString()
             saveData(date, place, memo)
             finish()
+        }
+        binding.detailImageView.setOnClickListener {
+            val intent = Intent(this, ZoomActivity::class.java)
+            intent.putExtra("image_url", imageUrl)
+            startActivity(intent)
         }
     }
 

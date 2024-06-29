@@ -24,6 +24,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".ImageDetailActivity" />
         <activity android:name=".phoneItemAddActivity"/>
+        <activity android:name=".ZoomActivity"/>
     </application>
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
