@@ -44,6 +44,10 @@ class imageFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = imageAdapter
 
+        // Add ItemDecoration to RecyclerView
+        val spacingInPixels = resources.getDimensionPixelSize(R.dimen.recycler_item_spacing)
+        recyclerView.addItemDecoration(RecyclerDecoration(spacingInPixels))
+
         val addButton: FloatingActionButton = view.findViewById(R.id.addButton)
         addButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
