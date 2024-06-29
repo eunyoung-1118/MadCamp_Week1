@@ -21,6 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ImageDetailActivity"/>
+        <activity android:name=".phoneItemAddActivity"/>
     </application>
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />

@@ -36,6 +36,17 @@
                     android:textColor="@android:color/white"
                     android:background="#00ff0000"/>
 
+                <TextView
+                    android:id="@+id/update_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="update"
+                    android:textSize="24sp"
+                    android:layout_gravity="left"
+                    android:padding="8dp"
+                    android:textColor="@android:color/white"
+                    android:background="#00ff0000"/>
+
             </androidx.appcompat.widget.Toolbar>
 
             <ListView
