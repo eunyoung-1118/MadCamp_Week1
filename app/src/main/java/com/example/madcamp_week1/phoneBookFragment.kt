@@ -1,37 +1,39 @@
 package com.example.madcamp_week1
 
 import android.Manifest
+import android.app.Activity
+import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.content.Context
-import android.widget.*
+import android.widget.BaseAdapter
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import android.app.Activity
-import android.content.Intent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.ActivityResultLauncher
-import android.content.ContentResolver
-import android.provider.ContactsContract
-import android.content.ContentUris
-import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 
 class phoneBookFragment : Fragment() {
+
+    private val nameList = ArrayList<String>()
+    private val numList = ArrayList<String>()
+    private lateinit var addContactLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
+    private lateinit var requestPermissionLauncher: androidx.activity.result.ActivityResultLauncher<String>
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_phone, container, false)
     }
-    private val nameList = ArrayList<String>()
-    private val numList = ArrayList<String>()
-
-    private lateinit var addContactLauncher: ActivityResultLauncher<Intent>
-    private lateinit var requestPermissionLauncher: androidx.activity.result.ActivityResultLauncher<String>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,14 +57,12 @@ class phoneBookFragment : Fragment() {
         }
 
         val list = view.findViewById<ListView>(R.id.listView)
-
         val adapter = CustomAdapter(requireContext())
         list.adapter = adapter
 
         list.setOnItemClickListener { parent, view, position, id ->
             val name = nameList[position]
             val number = numList[position]
-
             val profileFragment = phoneProfileFragment.newInstance(name, number)
 
             parentFragmentManager.beginTransaction()
@@ -142,5 +142,4 @@ class phoneBookFragment : Fragment() {
             return itemView
         }
     }
-
 }
