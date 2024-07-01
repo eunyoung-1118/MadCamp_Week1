@@ -25,9 +25,6 @@ import kotlinx.coroutines.withContext
 class phoneBookFragment : Fragment() {
 
     private lateinit var repository: PhoneBookRepository
-    private val nameList = ArrayList<String>()
-    private val numList = ArrayList<String>()
-    private val photoUriList = ArrayList<String>()
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private var syncedList: MutableList<PhoneBook> = mutableListOf()
     private lateinit var adapter: phoneBookAdapter
@@ -115,9 +112,10 @@ class phoneBookFragment : Fragment() {
         }
     }
 
-    private suspend fun updateUI(sortedContacts: List<PhoneBook>) {
+    private suspend fun updateUI(ContactList: List<PhoneBook>) {
         withContext(Dispatchers.Main) {
-            adapter.updateData(sortedContacts)
+            val sortedList = ContactList.sortedBy { it.name }
+            adapter.updateData(sortedList)
         }
     }
 }
