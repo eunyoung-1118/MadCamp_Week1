@@ -14,6 +14,7 @@ import androidx.activity.result.ActivityResultLauncher
 import android.content.ContentResolver
 import android.provider.ContactsContract
 import android.util.Log
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import com.example.madcamp_week1.data.db.PhoneBook
 import com.example.madcamp_week1.data.repository.DatabaseProvider
@@ -25,9 +26,6 @@ import kotlinx.coroutines.withContext
 class phoneBookFragment : Fragment() {
 
     private lateinit var repository: PhoneBookRepository
-    private val nameList = ArrayList<String>()
-    private val numList = ArrayList<String>()
-    private val photoUriList = ArrayList<String>()
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private var syncedList: MutableList<PhoneBook> = mutableListOf()
     private lateinit var adapter: phoneBookAdapter
@@ -47,9 +45,28 @@ class phoneBookFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Listview와 어댑터 설정
         adapter = phoneBookAdapter(emptyList())
-        view.findViewById<ListView>(R.id.listView).adapter = adapter
+        val listView = view.findViewById<ListView>(R.id.listView)
+        listView.adapter = adapter
 
+        // ListView 아이템 클릭 리스너 설정
+        listView.setOnItemClickListener { _, _, position, _ ->
+            val contact = adapter.getItem(position)
+
+            val bundle = Bundle().apply {
+                putLong("id", contact.id ?: 0L)
+            }
+
+            val fragment = phoneProfileFragment().apply {
+                arguments = bundle
+            }
+
+            val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment_container, fragment)
+            transaction.addToBackStack(null)
+            transaction.commit()
+        }
 
         // 퍼미션 요청 런처 초기화
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -115,9 +132,10 @@ class phoneBookFragment : Fragment() {
         }
     }
 
-    private suspend fun updateUI(sortedContacts: List<PhoneBook>) {
+    private suspend fun updateUI(ContactList: List<PhoneBook>) {
         withContext(Dispatchers.Main) {
-            adapter.updateData(sortedContacts)
+            val sortedList = ContactList.sortedBy { it.name }
+            adapter.updateData(sortedList)
         }
     }
 }

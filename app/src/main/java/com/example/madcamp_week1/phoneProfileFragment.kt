@@ -12,13 +12,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-
+import com.example.madcamp_week1.data.db.PhoneBook
+import com.example.madcamp_week1.data.repository.PhoneBookRepository
+import com.example.madcamp_week1.data.repository.DatabaseProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class phoneProfileFragment : Fragment() {
-    private lateinit var nameTextView: TextView
-    private lateinit var numberTextView: TextView
-    private lateinit var profileImageView: ImageView
+
+    private lateinit var repository: PhoneBookRepository
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,6 +35,8 @@ class phoneProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        repository = PhoneBookRepository(DatabaseProvider.getDatabase(requireContext()).phoneBookDao())
+
         val toolbar = view.findViewById<Toolbar>(R.id.profile_toolbar)
         (activity as? AppCompatActivity)?.setSupportActionBar(toolbar)
         (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -39,38 +46,43 @@ class phoneProfileFragment : Fragment() {
             cancelProfile()
         }
 
-        nameTextView = view.findViewById(R.id.profile_name)
-        numberTextView = view.findViewById(R.id.profile_num)
-        profileImageView = view.findViewById(R.id.profile_image)
         val callButton = view.findViewById<ImageView>(R.id.call_button)
         val messageButton = view.findViewById<ImageView>(R.id.message_button)
 
-        val name = arguments?.getString("name")
-        val number = arguments?.getString("number")
-        val photoUri = arguments?.getString("photoUri")
-
-        nameTextView.text = name
-        numberTextView.text = number
-
-        if (photoUri != null && photoUri.isNotEmpty()) {
-            Glide.with(this)
-                .load(photoUri)
-                .placeholder(R.drawable.person)
-                .into(profileImageView)
-        } else {
-            profileImageView.setImageResource(R.drawable.person)
+        val id = arguments?.getLong("id")
+        var contact: PhoneBook? =null
+        // Coroutine을 사용하여 suspend 함수 호출
+        if (id != null) {
+            lifecycleScope.launch {
+                contact = repository.getContact(id)
+                withContext(Dispatchers.Main) {
+                    updateUI(view, contact)
+                }
+            }
         }
 
         callButton.setOnClickListener {
             val dialIntent = Intent(Intent.ACTION_DIAL)
-            dialIntent.data = Uri.parse("tel:$number")
+            dialIntent.data = Uri.parse("tel:${contact?.num}")
             startActivity(dialIntent)
         }
 
         messageButton.setOnClickListener {
             val smsIntent = Intent(Intent.ACTION_VIEW)
-            smsIntent.data = Uri.parse("sms:$number")
+            smsIntent.data = Uri.parse("sms:${contact?.num}")
             startActivity(smsIntent)
+        }
+    }
+
+    private fun updateUI(view: View, contact: PhoneBook?) {
+        val profileImageView = view.findViewById<ImageView>(R.id.profile_image)
+        view.findViewById<TextView>(R.id.profile_name).text = contact?.name
+        view.findViewById<TextView>(R.id.profile_num).text = contact?.num
+
+        if (contact?.image != null && contact.image.isNotEmpty()) {
+            profileImageView.setImageURI(Uri.parse(contact.image))
+        } else {
+            profileImageView.setImageResource(R.drawable.person)
         }
     }
 
@@ -80,9 +92,10 @@ class phoneProfileFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(name: String, number: String, photoUri: String): phoneProfileFragment {
+        fun newInstance(id: Long, name: String, number: String, photoUri: String): phoneProfileFragment {
             val fragment = phoneProfileFragment()
             val args = Bundle()
+            args.putLong("id", id)
             args.putString("name", name)
             args.putString("number", number)
             args.putString("photoUri", photoUri)

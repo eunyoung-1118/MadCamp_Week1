@@ -1,5 +1,6 @@
 package com.example.madcamp_week1
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +27,15 @@ class phoneBookAdapter(private var contacts: List<PhoneBook>) : BaseAdapter() {
 
         nameTextView.text = contact.name
         numTextView.text = contact.num
-        // Set photoUri if available
+        contact.image?.let {
+            if (it.isNotEmpty()) {
+                contactImageView.setImageURI(Uri.parse(it))
+            } else {
+                contactImageView.setImageResource(R.drawable.person) // Default image resource
+            }
+        } ?: run {
+            contactImageView.setImageResource(R.drawable.person) // Default image resource
+        }
 
         return view
     }

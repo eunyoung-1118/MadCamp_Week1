@@ -26,4 +26,6 @@ interface PhoneBookDao {
 
     @Query("SELECT * FROM phone_book WHERE name = :name AND num = :num LIMIT 1")
     suspend fun getContactByNameAndNumber(name: String, num: String): PhoneBook?
+
+
 }
