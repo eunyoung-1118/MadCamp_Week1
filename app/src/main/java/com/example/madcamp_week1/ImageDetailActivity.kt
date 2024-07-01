@@ -40,20 +40,17 @@ class ImageDetailActivity : AppCompatActivity() {
 
         imageUrl = intent.getStringExtra("image_url")
 
-        // Request permissions
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestMediaPermissions()
         } else {
             loadImage()
         }
 
-        // Save button click listener
         binding.saveButton.setOnClickListener {
             val date = binding.dateEditText.text.toString()
             val place = binding.placeEditText.text.toString()
             val memo = binding.memoEditText.text.toString()
             saveData(date, place, memo)
-            finish()
         }
 
         binding.detailImageView.setOnClickListener {
