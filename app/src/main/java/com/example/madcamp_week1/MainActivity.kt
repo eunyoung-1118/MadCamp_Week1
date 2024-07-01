@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
 
         val tabLayout: TabLayout = findViewById(R.id.tab_layout)
         val phoneBookFragment: Fragment = phoneBookFragment()
-        val imageFragment: Fragment = imageFragment()
+        val imageFragment: Fragment = ImageFragment()
         val freeFragment: Fragment = freeFragment()
 
         supportFragmentManager.beginTransaction().replace(R.id.main_view, phoneBookFragment).commit()
