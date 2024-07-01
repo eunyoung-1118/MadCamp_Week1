@@ -21,5 +21,12 @@ class PhoneBookRepository(private val phoneBookDao: PhoneBookDao) {
     suspend fun getContact(id: Long): PhoneBook {
         return phoneBookDao.getContact(id)
     }
+    suspend fun deleteAll() {
+        phoneBookDao.deleteAll()
+    }
+
+    suspend fun getContactByNameAndNumber(name: String, num: String): PhoneBook? {
+        return phoneBookDao.getContactByNameAndNumber(name, num)
+    }
 
 }

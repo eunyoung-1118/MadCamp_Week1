@@ -21,4 +21,9 @@ interface PhoneBookDao {
     @Query("SELECT * FROM phone_book WHERE id = :id LIMIT 1")
     suspend fun getContact(id: Long): PhoneBook
 
+    @Query("DELETE FROM phone_book")
+    suspend fun deleteAll()
+
+    @Query("SELECT * FROM phone_book WHERE name = :name AND num = :num LIMIT 1")
+    suspend fun getContactByNameAndNumber(name: String, num: String): PhoneBook?
 }

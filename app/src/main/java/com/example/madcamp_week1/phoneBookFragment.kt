@@ -43,18 +43,21 @@ class phoneBookFragment : Fragment() {
         // UI 준비
         return inflater.inflate(R.layout.fragment_phone, container, false)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = phoneBookAdapter(emptyList())
         view.findViewById<ListView>(R.id.listView).adapter = adapter
+
+
         // 퍼미션 요청 런처 초기화
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
-                loadContacts()
+                loadContactsIfNeeded()
                 lifecycleScope.launch(Dispatchers.IO) {
                     syncedList = repository.getAllContact().toMutableList()
-                    Log.d("phoneBookFragment", "syncedList:${syncedList.size}")
+                    Log.d("phoneBookFragment", "syncedList: ${syncedList.size}")
 
                     withContext(Dispatchers.Main) {
                         updateUI(syncedList)
@@ -69,8 +72,18 @@ class phoneBookFragment : Fragment() {
         view.findViewById<Button>(R.id.update_button).setOnClickListener {
             requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         }
+        requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+
     }
 
+    private fun loadContactsIfNeeded() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val currentContacts = repository.getAllContact()
+            if (currentContacts.isEmpty()) {
+                loadContacts()
+            }
+        }
+    }
 
     private fun loadContacts() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -85,40 +98,26 @@ class phoneBookFragment : Fragment() {
                 val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
                 val photoUriIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
 
-
                 while (cursor.moveToNext()) {
                     val name = cursor.getString(nameIndex)
                     val number = cursor.getString(numberIndex)
                     val photoUri = cursor.getString(photoUriIndex) ?: ""
 
+                    val phoneBook = PhoneBook(name = name, num = number, image = photoUri)
 
-                    if (!nameList.contains(name) && !numList.contains(number)) {
-                        val phoneBook = PhoneBook(name = name, num = number, image = photoUri)
-                        Log.d("phoneBook","phoneBook.name=${name}")
-
-                        nameList.add(name)
-                        numList.add(number)
-                        photoUriList.add(photoUri)
+                    // 중복 확인 후 삽입
+                    val existingContact = repository.getContactByNameAndNumber(name, number)
+                    if (existingContact == null) {
                         repository.insert(phoneBook)
                     }
-
                 }
-
-                // PhoneBookRepository에 연락처 저장
-
             }
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private suspend fun updateUI(sortedContacts: List<PhoneBook>) {
-        val phoneBooks = repository.getAllContact()
-
         withContext(Dispatchers.Main) {
-            syncedList.clear()
-            syncedList.addAll(phoneBooks)
-            adapter.updateData(syncedList)
-
+            adapter.updateData(sortedContacts)
         }
     }
 }
