@@ -1,6 +1,7 @@
 package com.example.madcamp_week1
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -18,11 +19,9 @@ import com.example.madcamp_week1.databinding.ActivityImageDetailBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import android.media.ExifInterface
 import com.example.madcamp_week1.data.repository.DatabaseProvider
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 
 class ImageDetailActivity : AppCompatActivity() {
 
@@ -41,23 +40,34 @@ class ImageDetailActivity : AppCompatActivity() {
 
         imageUrl = intent.getStringExtra("image_url")
 
+        // Request permissions
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestMediaPermissions()
         } else {
             loadImage()
         }
 
+        // Save button click listener
         binding.saveButton.setOnClickListener {
             val date = binding.dateEditText.text.toString()
             val place = binding.placeEditText.text.toString()
             val memo = binding.memoEditText.text.toString()
             saveData(date, place, memo)
+            finish()
         }
 
         binding.detailImageView.setOnClickListener {
             val intent = Intent(this, ZoomActivity::class.java)
             intent.putExtra("image_url", imageUrl)
             startActivity(intent)
+        }
+
+        binding.root.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                hideKeyboard()
+                v.performClick()
+            }
+            false
         }
     }
 
@@ -97,31 +107,10 @@ class ImageDetailActivity : AppCompatActivity() {
             Glide.with(this)
                 .load(it)
                 .into(binding.detailImageView)
-            setExifDate()
             loadData()
         } ?: showErrorAndFinish()
     }
 
-    private fun setExifDate() {
-        try {
-            imageUrl?.let { url ->
-                val inputStream = contentResolver.openInputStream(android.net.Uri.parse(url))
-                inputStream?.let {
-                    val exif = ExifInterface(it)
-                    val exifDate = exif.getAttribute(ExifInterface.TAG_DATETIME)
-                    val formatter = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault())
-                    val date: Date? = exifDate?.let { formatter.parse(it) }
-                    val displayFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                    val displayDate = date?.let { displayFormatter.format(it) } ?: ""
-                    binding.dateEditText.setText(displayDate)
-                    it.close()
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            binding.dateEditText.setText("")
-        }
-    }
 
     private fun loadData() {
         imageUrl?.let { url ->
@@ -168,5 +157,13 @@ class ImageDetailActivity : AppCompatActivity() {
     private fun showErrorAndFinish() {
         Toast.makeText(this, "Invalid image URL", Toast.LENGTH_SHORT).show()
         finish()
+    }
+
+    private fun hideKeyboard() {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusView = currentFocus
+        currentFocusView?.let {
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
+        }
     }
 }
