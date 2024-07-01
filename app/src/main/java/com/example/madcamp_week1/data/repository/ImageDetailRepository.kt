@@ -20,4 +20,10 @@ class ImageDetailRepository(private val imageDetailDao: ImageDetailDao) {
     suspend fun getAllImages(): List<ImageDetail> {
         return imageDetailDao.getAllImages()
     }
+    suspend fun deleteImage(imageDetail: ImageDetail) {
+        imageDetailDao.deleteImage(imageDetail)
+    }
+    suspend fun getImageUrl(url: String): String? {
+        return imageDetailDao.getImageUrl(url)
+    }
 }
