@@ -100,21 +100,25 @@ class ImageDetailActivity : AppCompatActivity() {
     }
 
     private fun loadImage() {
-        imageUrl?.let {
-            Glide.with(this)
-                .load(it)
-                .into(binding.detailImageView)
-            loadData()
+        imageUrl?.let { url ->
+            lifecycleScope.launch {
+                val imageUri = repository.getImageUrl(url)
+                imageUri?.let {
+                    withContext(Dispatchers.Main) {
+                        Glide.with(this@ImageDetailActivity)
+                            .load(it)
+                            .into(binding.detailImageView)
+                    }
+                    loadData()
+                } ?: showErrorAndFinish()
+            }
         } ?: showErrorAndFinish()
     }
-
 
     private fun loadData() {
         imageUrl?.let { url ->
             lifecycleScope.launch {
-                val imageDetail = withContext(Dispatchers.IO) {
-                    repository.getImageDetail(url)
-                }
+                val imageDetail = repository.getImageDetail(url)
                 imageDetail?.let {
                     binding.dateEditText.setText(it.date)
                     binding.placeEditText.setText(it.place)
@@ -127,9 +131,7 @@ class ImageDetailActivity : AppCompatActivity() {
     private fun saveData(date: String, place: String, memo: String) {
         imageUrl?.let { url ->
             lifecycleScope.launch(Dispatchers.IO) {
-                val imageDetail = withContext(Dispatchers.IO) {
-                    repository.getImageDetail(url)
-                }
+                val imageDetail = repository.getImageDetail(url)
 
                 if (imageDetail != null) {
                     // 기존 데이터가 있으면 업데이트
