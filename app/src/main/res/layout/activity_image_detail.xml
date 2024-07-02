@@ -47,6 +47,40 @@
             android:layout_height="wrap_content"
             android:hint="Place"
             android:layout_marginBottom="16dp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="인원"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/addButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:text="+"
+                android:textColor="@color/black"
+                android:gravity="center_vertical|start"
+                style="@style/CustomButton"/>
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/peopleEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="People"
+            android:layout_marginBottom="16dp"
+            android:focusable="false"
+            android:clickable="true"/>
+
 
         <TextView
             android:layout_width="match_parent"
@@ -69,5 +103,6 @@
             android:layout_height="wrap_content"
             android:text="Save"
             android:backgroundTint="#7F9C61"/>
+
     </LinearLayout>
 </layout>

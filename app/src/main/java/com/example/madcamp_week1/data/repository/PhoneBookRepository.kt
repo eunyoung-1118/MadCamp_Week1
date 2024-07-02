@@ -29,4 +29,7 @@ class PhoneBookRepository(private val phoneBookDao: PhoneBookDao) {
         return phoneBookDao.getContactByNameAndNumber(name, num)
     }
 
+    suspend fun getContactByName(name: String): PhoneBook {
+        return phoneBookDao.getContactByName(name)
+    }
 }
