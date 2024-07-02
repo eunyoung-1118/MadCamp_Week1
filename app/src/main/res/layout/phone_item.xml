@@ -29,18 +29,19 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:layout_marginTop="16dp"
             android:id="@+id/nameItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#000000"
-            android:textSize="30dp" />
+            android:textSize="25sp" />
 
         <TextView
             android:id="@+id/numItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/nameItem"
-            android:textSize="25dp" />
+            android:textSize="20sp" />
 
     </RelativeLayout>
 
