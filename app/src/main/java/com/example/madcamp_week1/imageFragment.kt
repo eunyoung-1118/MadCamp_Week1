@@ -88,6 +88,7 @@ class ImageFragment : Fragment() {
             date = date,
             place = null,
             memo = null,
+            people = null,
             imageUri = imageUri
         )
         repository.insert(imageDetail)

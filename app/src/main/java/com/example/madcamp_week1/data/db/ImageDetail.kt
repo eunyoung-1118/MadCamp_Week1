@@ -9,6 +9,7 @@ data class ImageDetail(
     var date: String?,
     var place: String?,
     var memo: String?,
+    var people: String?,
     val imageUri: String? // 새로운 필드 추가
 
 )

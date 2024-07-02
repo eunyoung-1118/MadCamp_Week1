@@ -6,6 +6,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -21,13 +26,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.example.madcamp_week1.data.repository.DatabaseProvider
 import android.view.MotionEvent
+import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.FragmentTransaction
+import com.example.madcamp_week1.data.repository.PhoneBookRepository
 
 class ImageDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityImageDetailBinding
     private var imageUrl: String? = null
     private lateinit var repository: ImageDetailRepository
+    private lateinit var PBrepository: PhoneBookRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +48,7 @@ class ImageDetailActivity : AppCompatActivity() {
         // 데이터베이스 인스턴스 초기화
         val db = DatabaseProvider.getDatabase(applicationContext)
         repository = ImageDetailRepository(db.imageDetailDao())
+        PBrepository = PhoneBookRepository(db.phoneBookDao())
 
         imageUrl = intent.getStringExtra("image_url")
 
@@ -49,8 +61,9 @@ class ImageDetailActivity : AppCompatActivity() {
         binding.saveButton.setOnClickListener {
             val date = binding.dateEditText.text.toString()
             val place = binding.placeEditText.text.toString()
+            val people = binding.peopleEditText.text.toString()
             val memo = binding.memoEditText.text.toString()
-            saveData(date, place, memo)
+            saveData(date, place, people, memo)
         }
 
         binding.detailImageView.setOnClickListener {
@@ -58,6 +71,19 @@ class ImageDetailActivity : AppCompatActivity() {
             intent.putExtra("image_url", imageUrl)
             startActivity(intent)
         }
+
+        binding.addButton.setOnClickListener {
+            showContactsDialog()
+        }
+
+        binding.addButton.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                showContactsDialog()
+            }
+        }
+
+        // 클릭 가능한 텍스트 설정
+        binding.peopleEditText.movementMethod = LinkMovementMethod.getInstance()
 
         binding.root.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -123,12 +149,13 @@ class ImageDetailActivity : AppCompatActivity() {
                     binding.dateEditText.setText(it.date)
                     binding.placeEditText.setText(it.place)
                     binding.memoEditText.setText(it.memo)
+                    setPeopleSpannableText(it.people)
                 }
             }
         }
     }
 
-    private fun saveData(date: String, place: String, memo: String) {
+    private fun saveData(date: String, place: String, people: String, memo: String) {
         imageUrl?.let { url ->
             lifecycleScope.launch(Dispatchers.IO) {
                 val imageDetail = repository.getImageDetail(url)
@@ -138,10 +165,11 @@ class ImageDetailActivity : AppCompatActivity() {
                     imageDetail.date = date
                     imageDetail.place = place
                     imageDetail.memo = memo
+                    imageDetail.people = people
                     repository.update(imageDetail)
                 } else {
                     // 새로운 데이터로 추가
-                    val newImageDetail = ImageDetail(url, date, place, memo, url)
+                    val newImageDetail = ImageDetail(url, date, place, memo, people, url)
                     repository.insert(newImageDetail)
                 }
 
@@ -165,4 +193,76 @@ class ImageDetailActivity : AppCompatActivity() {
             inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
         }
     }
+
+    private fun showContactsDialog() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val contacts = PBrepository.getAllContact()
+            val contactNames = contacts.map { it.name }.toTypedArray()
+            val selectedContacts = mutableListOf<String>()
+            val selectedItems = BooleanArray(contactNames.size)
+
+            withContext(Dispatchers.Main) {
+                AlertDialog.Builder(this@ImageDetailActivity)
+                    .setTitle("Select people")
+                    .setMultiChoiceItems(contactNames, selectedItems) { _, which, isChecked ->
+                        if (isChecked) {
+                            contactNames[which]?.let { selectedContacts.add(it) }
+                        } else {
+                            selectedContacts.remove(contactNames[which])
+                        }
+                    }
+                    .setPositiveButton("OK") { _, _ ->
+                        binding.peopleEditText.setText(selectedContacts.joinToString(", "))
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
+    }
+    private fun setPeopleSpannableText(people: String?) {
+        if (people.isNullOrEmpty()) return
+
+        val spannableString = SpannableString(people)
+        val names = people.split(", ")
+
+        var start = 0
+        for (name in names) {
+            val end = start + name.length
+            val clickableSpan = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    lifecycleScope.launch {
+                        val contact = PBrepository.getContactByName(name)
+                        if (contact != null) {
+                            val intent = contact.id?.let {
+                                contact.name?.let { it1 ->
+                                    contact.num?.let { it2 ->
+                                        phoneProfileActivity.newIntent(
+                                            this@ImageDetailActivity,
+                                            it, it1, it2, contact.image
+
+                                        )
+                                    }
+                                }
+                            }
+                            Log.d("ImageDetailActivity","${contact.name}")
+                            startActivity(intent)
+                        } else {
+
+                            Toast.makeText(this@ImageDetailActivity, "Contact not found", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+            spannableString.setSpan(clickableSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            start = end + 2 // ", " 를 고려하여 2를 더해줌
+        }
+
+        binding.peopleEditText.setText(spannableString, TextView.BufferType.SPANNABLE)
+    }
+
+
+
 }
+
+
+
