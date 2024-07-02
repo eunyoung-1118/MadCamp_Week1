@@ -4,10 +4,12 @@ import android.content.Intent
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.madcamp_week1.data.repository.DatabaseProvider
 import com.example.madcamp_week1.data.repository.ImageDetailRepository
@@ -27,7 +29,10 @@ class freeFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var repository: ImageDetailRepository
-    private val markerMap = mutableMapOf<Marker, String>()
+    private val markerMap = mutableMapOf<Int, Marker>()
+    private val markerImageMap = mutableMapOf<Marker, String>()
+    private var markerCounter = 1
+    private var currentMarkerIndex = 1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +49,12 @@ class freeFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        // 버튼 클릭 리스너 설정
+        val nextMarkerButton: Button = view.findViewById(R.id.next_marker_button)
+        nextMarkerButton.setOnClickListener {
+            moveToNextMarker()
+        }
+
         return view
     }
 
@@ -54,7 +65,7 @@ class freeFragment : Fragment(), OnMapReadyCallback {
 
         // 마커 클릭 리스너 설정
         mMap.setOnMarkerClickListener { marker ->
-            val imageUrl = markerMap[marker]
+            val imageUrl = markerImageMap[marker]
             imageUrl?.let {
                 val intent = Intent(requireContext(), ImageDetailActivity::class.java)
                 intent.putExtra("image_url", it)
@@ -86,9 +97,12 @@ class freeFragment : Fragment(), OnMapReadyCallback {
                             val latLng = LatLng(address.latitude, address.longitude)
                             Log.d("freeFragment", "Found location: $latLng for place: $place")
                             withContext(Dispatchers.Main) {
-                                val marker = mMap.addMarker(MarkerOptions().position(latLng).title(place))
-                                markerMap[marker!!] = image.url
-                                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                                val marker = mMap.addMarker(MarkerOptions().position(latLng).title("Marker #$markerCounter: $place"))
+                                marker?.let {
+                                    markerMap[markerCounter] = it
+                                    markerImageMap[it] = image.url
+                                    markerCounter++
+                                }
                             }
                         } else {
                             Log.d("freeFragment", "No address found for place: $place")
@@ -101,6 +115,23 @@ class freeFragment : Fragment(), OnMapReadyCallback {
                     Log.d("freeFragment", "Place is null or empty for image: ${image.url}")
                 }
             }
+        }
+    }
+
+    private fun moveToNextMarker() {
+        if (markerMap.isNotEmpty()) {
+            if (currentMarkerIndex > markerMap.size) {
+                currentMarkerIndex = 1 // 처음으로 돌아가기
+            }
+            val marker = markerMap[currentMarkerIndex]
+            marker?.let {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it.position, 15f))
+                currentMarkerIndex++
+            } ?: run {
+                Toast.makeText(requireContext(), "Marker not found", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(requireContext(), "No markers available", Toast.LENGTH_SHORT).show()
         }
     }
 }

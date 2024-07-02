@@ -22,6 +22,7 @@ import com.example.madcamp_week1.data.repository.PhoneBookRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.appcompat.widget.SearchView
 
 class phoneBookFragment : Fragment() {
 
@@ -89,8 +90,22 @@ class phoneBookFragment : Fragment() {
         view.findViewById<Button>(R.id.update_button).setOnClickListener {
             requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         }
-        requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
 
+        // SearchView 설정
+        val searchView: SearchView = view.findViewById(R.id.search_view)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let { filterContacts(it) }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let { filterContacts(it) }
+                return true
+            }
+        })
+
+        requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
     }
 
     private fun loadContactsIfNeeded() {
@@ -132,9 +147,18 @@ class phoneBookFragment : Fragment() {
         }
     }
 
-    private suspend fun updateUI(ContactList: List<PhoneBook>) {
+    private fun filterContacts(query: String) {
+        val filteredList = syncedList.filter {
+            it.name?.contains(query, ignoreCase = true) == true || it.num?.contains(query) == true
+        }
+        lifecycleScope.launch {
+            updateUI(filteredList)
+        }
+    }
+
+    private suspend fun updateUI(contactList: List<PhoneBook>) {
         withContext(Dispatchers.Main) {
-            val sortedList = ContactList.sortedBy { it.name }
+            val sortedList = contactList.sortedBy { it.name }
             adapter.updateData(sortedList)
         }
     }
