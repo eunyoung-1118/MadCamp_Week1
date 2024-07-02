@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         val tabLayout: TabLayout = findViewById(R.id.tab_layout)
         val phoneBookFragment: Fragment = phoneBookFragment()
         val imageFragment: Fragment = ImageFragment()
-        val freeFragment: Fragment = freeFragment()
+        val mapFragment: Fragment = mapFragment()
 
         supportFragmentManager.beginTransaction().replace(R.id.main_view, phoneBookFragment).commit()
 
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
                         supportFragmentManager.beginTransaction().replace(R.id.main_view, imageFragment).commit()
                     }
                     2 -> {
-                        supportFragmentManager.beginTransaction().replace(R.id.main_view, freeFragment).commit()
+                        supportFragmentManager.beginTransaction().replace(R.id.main_view, mapFragment).commit()
                     }
                 }
             }

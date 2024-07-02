@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class freeFragment : Fragment(), OnMapReadyCallback {
+class mapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var repository: ImageDetailRepository
@@ -39,7 +39,7 @@ class freeFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_free, container, false)
+        val view = inflater.inflate(R.layout.fragment_map, container, false)
 
         // 데이터베이스 인스턴스 초기화
         val db = DatabaseProvider.getDatabase(requireContext())

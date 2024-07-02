@@ -46,8 +46,8 @@
             android:id="@+id/free_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/free"
-            android:text="@string/free" />
+            android:icon="@drawable/map"
+            android:text="@string/map" />
 
     </com.google.android.material.tabs.TabLayout>
 
