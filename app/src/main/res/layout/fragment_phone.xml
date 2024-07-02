@@ -29,15 +29,24 @@
                     android:id="@+id/update_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="update"
+                    android:text="Update"
                     android:textSize="24sp"
                     android:layout_gravity="left"
                     android:padding="8dp"
                     android:textColor="@android:color/white"
                     android:background="#00ff0000"/>
 
+
             </androidx.appcompat.widget.Toolbar>
 
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/search_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:queryHint="Search contacts"
+                android:background="#00ff0000"
+                android:iconifiedByDefault="false"/>
             <ListView
                 android:id="@+id/listView"
                 android:layout_width="match_parent"
