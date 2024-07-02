@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +21,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ImageFragment : Fragment() {
 
@@ -78,14 +82,36 @@ class ImageFragment : Fragment() {
     }
 
     private suspend fun saveImageToDB(imageUri: String) {
+        val date = extractDateFromImage(imageUri)
         val imageDetail = ImageDetail(
             url = imageUri,
-            date = null,
+            date = date,
             place = null,
             memo = null,
             imageUri = imageUri
         )
         repository.insert(imageDetail)
+    }
+
+    private fun extractDateFromImage(imageUri: String): String? {
+        return try {
+            val inputStream = context?.contentResolver?.openInputStream(Uri.parse(imageUri))
+            inputStream?.use {
+                val exif = ExifInterface(it)
+                val exifDate = exif.getAttribute(ExifInterface.TAG_DATETIME)
+                if (exifDate != null) {
+                    val formatter = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault())
+                    val date: Date? = formatter.parse(exifDate)
+                    val displayFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                    date?.let { displayFormatter.format(it) }
+                } else {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     private fun loadImagesFromDB() {

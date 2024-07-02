@@ -17,7 +17,6 @@ interface PhoneBookDao {
     @Query("SELECT * FROM phone_book")
     suspend fun getAllContact(): List<PhoneBook>
 
-
     @Query("SELECT * FROM phone_book WHERE id = :id LIMIT 1")
     suspend fun getContact(id: Long): PhoneBook
 
