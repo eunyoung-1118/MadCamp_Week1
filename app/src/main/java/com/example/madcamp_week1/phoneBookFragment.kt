@@ -70,7 +70,7 @@ class phoneBookFragment : Fragment() {
         // 퍼미션 요청 런처 초기화
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
-                loadContacts()
+                updateContacts()
             } else {
                 Toast.makeText(context, "Contacts permission denied", Toast.LENGTH_SHORT).show()
             }
@@ -99,8 +99,12 @@ class phoneBookFragment : Fragment() {
         requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
     }
 
-    private fun loadContacts() {
+    private fun updateContacts() {
         lifecycleScope.launch(Dispatchers.IO) {
+            // 기존 연락처 모두 삭제
+            repository.deleteAll()
+
+            // 새 연락처 불러오기
             val contentResolver: ContentResolver = requireContext().contentResolver
             val cursor = contentResolver.query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -119,11 +123,8 @@ class phoneBookFragment : Fragment() {
 
                     val phoneBook = PhoneBook(name = name, num = number, image = photoUri)
 
-                    // 중복 확인 후 삽입
-                    val existingContact = repository.getContactByNameAndNumber(name, number)
-                    if (existingContact == null) {
-                        repository.insert(phoneBook)
-                    }
+                    // 새로운 연락처 추가
+                    repository.insert(phoneBook)
                 }
             }
 
