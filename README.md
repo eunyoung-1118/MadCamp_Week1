@@ -42,22 +42,22 @@
 
 <table>
   <tr>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/0d5c6c03-e149-4f2c-b3bc-baeb78bd6268" alt="앱 로딩화면" width="300"><br>앱 로딩화면</td>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/539a1744-b15a-4727-8578-1367fa019c1a" alt="연락처 탭 리스트" width="300"><br>연락처 탭 리스트</td>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/2bba0452-50bd-44eb-9399-dcf602b71c98" alt="연락처 추가 및 업데이트" width="300"><br>연락처 추가 및 업데이트</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/0d5c6c03-e149-4f2c-b3bc-baeb78bd6268" alt="앱 로딩화면" width="200"><br>앱 로딩화면</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/539a1744-b15a-4727-8578-1367fa019c1a" alt="연락처 탭 리스트" width="200"><br>연락처 탭 리스트</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/2bba0452-50bd-44eb-9399-dcf602b71c98" alt="연락처 추가 및 업데이트" width="200"><br>연락처 추가 및 업데이트</td>
   </tr>
   <tr>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/2e612436-39d7-4391-b39b-d37d3ed501bf" alt="연락처 프로필 및 전화 문자 연결" width="300"><br>연락처 프로필 및 전화 문자 연결</td>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/b8fb1d98-c1ce-46e3-ad12-b14032efcf4a" alt="연락처 검색" width="300"><br>연락처 검색</td>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/c13b0f70-290d-4e49-bec9-b2f9e6f68947" alt="사진 삭제" width="300"><br>사진 삭제</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/2e612436-39d7-4391-b39b-d37d3ed501bf" alt="연락처 프로필 및 전화 문자 연결" width="200"><br>연락처 프로필 및 전화 문자 연결</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/b8fb1d98-c1ce-46e3-ad12-b14032efcf4a" alt="연락처 검색" width="200"><br>연락처 검색</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/c13b0f70-290d-4e49-bec9-b2f9e6f68947" alt="사진 삭제" width="200"><br>사진 삭제</td>
   </tr>
   <tr>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/692351f7-a542-472b-9e3a-6783271fadab" alt="앨범 사진 세부사항" width="300"><br>앨범 사진 세부사항</td>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/63e0de33-3b19-41dd-a2b0-ee34b3371c37" alt="앨범 탭 사진 추가" width="300"><br>앨범 탭 사진 추가</td>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/e6f72028-c5fb-4a1b-91d4-134216811325" alt="사진 줌" width="300"><br>사진 줌</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/692351f7-a542-472b-9e3a-6783271fadab" alt="앨범 사진 세부사항" width="200"><br>앨범 사진 세부사항</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/63e0de33-3b19-41dd-a2b0-ee34b3371c37" alt="앨범 탭 사진 추가" width="200"><br>앨범 탭 사진 추가</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/e6f72028-c5fb-4a1b-91d4-134216811325" alt="사진 줌" width="200"><br>사진 줌</td>
   </tr>
   <tr>
-    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/2f6aef89-ebe4-4bd6-8a6d-1f7d4d62c2b6" alt="지도 탭 마커 이동 및 클릭" width="300"><br>지도 탭 마커 이동 및 클릭</td>
+    <td><img src="https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/2f6aef89-ebe4-4bd6-8a6d-1f7d4d62c2b6" alt="지도 탭 마커 이동 및 클릭" width="200"><br>지도 탭 마커 이동 및 클릭</td>
     <td></td>
     <td></td>
   </tr>
