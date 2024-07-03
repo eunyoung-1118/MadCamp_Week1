@@ -1,6 +1,7 @@
 package com.example.madcamp_week1
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -30,6 +31,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentTransaction
 import com.example.madcamp_week1.data.repository.PhoneBookRepository
 
@@ -56,6 +58,15 @@ class ImageDetailActivity : AppCompatActivity() {
             requestMediaPermissions()
         } else {
             loadImage()
+        }
+
+        val toolbar = findViewById<Toolbar>(R.id.image_detail_toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.title = ""
+        toolbar.setNavigationOnClickListener {
+            cancelImageDetail()
         }
 
         binding.saveButton.setOnClickListener {
@@ -260,8 +271,10 @@ class ImageDetailActivity : AppCompatActivity() {
         binding.peopleEditText.setText(spannableString, TextView.BufferType.SPANNABLE)
     }
 
-
-
+    private fun cancelImageDetail() {
+        setResult(Activity.RESULT_CANCELED)
+        finish()
+    }
 }
 
 
