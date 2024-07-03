@@ -38,6 +38,47 @@
 
 ## View
 
+---
+
+![초기화면](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/0d5c6c03-e149-4f2c-b3bc-baeb78bd6268)
+
+앱 로딩화면
+
+![연락처탭](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/539a1744-b15a-4727-8578-1367fa019c1a)
+
+연락처 탭 리스트
+
+![새로운 연락처 업데이트](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/2bba0452-50bd-44eb-9399-dcf602b71c98)
+
+연락처 추가 및 업데이트
+
+![전화및 문자연결](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/2e612436-39d7-4391-b39b-d37d3ed501bf)
+
+연락처 프로필 및 전화 문자 연결
+
+![연락처 검색](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/b8fb1d98-c1ce-46e3-ad12-b14032efcf4a)
+
+연락처 검색
+
+![사진삭제](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/c13b0f70-290d-4e49-bec9-b2f9e6f68947)
+
+사진 삭제
+
+![이미지 뷰 및 세부사항](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/692351f7-a542-472b-9e3a-6783271fadab)
+
+앨범 사진 세부사항
+
+![사진추가](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/63e0de33-3b19-41dd-a2b0-ee34b3371c37)
+
+앨범 탭 사진 추가
+
+![줌액티비](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/e6f72028-c5fb-4a1b-91d4-134216811325)
+
+사진 줌
+
+![마커이동](https://github.com/eunyoung-1118/MadCamp_Week1/assets/137619133/2f6aef89-ebe4-4bd6-8a6d-1f7d4d62c2b6)
+
+지도 탭 마커 이동 및 클릭
 
 ---
 
