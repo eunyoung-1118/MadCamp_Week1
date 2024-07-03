@@ -1,7 +1,6 @@
 package com.example.madcamp_week1
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
 import android.content.ContentResolver
 import android.provider.ContactsContract
-import android.util.Log
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import com.example.madcamp_week1.data.db.PhoneBook
@@ -46,7 +44,7 @@ class phoneBookFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Listview와 어댑터 설정
+        // ListView와 어댑터 설정
         adapter = phoneBookAdapter(emptyList())
         val listView = view.findViewById<ListView>(R.id.listView)
         listView.adapter = adapter
@@ -72,15 +70,7 @@ class phoneBookFragment : Fragment() {
         // 퍼미션 요청 런처 초기화
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
-                loadContactsIfNeeded()
-                lifecycleScope.launch(Dispatchers.IO) {
-                    syncedList = repository.getAllContact().toMutableList()
-                    Log.d("phoneBookFragment", "syncedList: ${syncedList.size}")
-
-                    withContext(Dispatchers.Main) {
-                        updateUI(syncedList)
-                    }
-                }
+                loadContacts()
             } else {
                 Toast.makeText(context, "Contacts permission denied", Toast.LENGTH_SHORT).show()
             }
@@ -105,16 +95,8 @@ class phoneBookFragment : Fragment() {
             }
         })
 
+        // 최초 권한 요청 및 데이터 로드
         requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
-    }
-
-    private fun loadContactsIfNeeded() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val currentContacts = repository.getAllContact()
-            if (currentContacts.isEmpty()) {
-                loadContacts()
-            }
-        }
     }
 
     private fun loadContacts() {
@@ -143,6 +125,11 @@ class phoneBookFragment : Fragment() {
                         repository.insert(phoneBook)
                     }
                 }
+            }
+
+            syncedList = repository.getAllContact().toMutableList()
+            withContext(Dispatchers.Main) {
+                updateUI(syncedList)
             }
         }
     }
